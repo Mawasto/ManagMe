@@ -14,7 +14,7 @@ function App() {
   const reloadProjects = () => setRefresh(!refresh);
 
   const handleProjectSelected = (projectId: string) => {
-    const selectedProject = ProjectStorage.getProjects().find(
+    const selectedProject = ProjectStorage.getAll().find(
       (project) => project.id === projectId
     );
     setCurrentProject(selectedProject || null);
