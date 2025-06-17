@@ -2,20 +2,28 @@ import { useEffect, useState } from "react";
 import { ProjectStorage } from "../api/ProjectStorage";
 import type { Project } from "../models/project";
 
-export function ProjectList() {
-    const [projects, setProjects] = useState<Project[]>([]);
+interface ProjectListProps {
+    onProjectSelected?: (projectId: string) => void;
+    refresh: boolean; // Add refresh prop type
+}
 
-    const loadProjects = () => {
-        setProjects(ProjectStorage.getAll());
-    };
+export function ProjectList({ onProjectSelected, refresh }: ProjectListProps) {
+    const [projects, setProjects] = useState<Project[]>(ProjectStorage.getAll());
 
     useEffect(() => {
-        loadProjects();
-    }, []);
+        setProjects(ProjectStorage.getAll());
+    }, [refresh]);
 
     const handleDelete = (id: string) => {
         ProjectStorage.delete(id);
-        loadProjects();
+        setProjects((prevProjects) => prevProjects.filter((project) => project.id !== id));
+    };
+
+    const handleSelectProject = (projectId: string) => {
+        ProjectStorage.setCurrentProject(projectId);
+        if (onProjectSelected) {
+            onProjectSelected(projectId); // Pass the projectId to the parent handler
+        }
     };
 
     return (
@@ -26,6 +34,7 @@ export function ProjectList() {
                 {projects.map((project) => (
                     <li key={project.id}>
                         <strong>{project.name}</strong> - {project.description}
+                        <button onClick={() => handleSelectProject(project.id)}>Wybierz projekt</button>
                         <button onClick={() => handleDelete(project.id)}>Usuń</button>
                     </li>
                 ))}
