@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { ProjectStorage } from '../api/ProjectStorage';
 import { UserManager } from '../api/UserManager';
+import TaskKanban from './TaskKanban';
+import TaskForm from './TaskForm';
 
 const StoryList: React.FC = () => {
   const [filter, setFilter] = useState<'todo' | 'doing' | 'done' | 'all'>('all');
@@ -51,6 +53,8 @@ const StoryList: React.FC = () => {
               <button onClick={() => handleUpdate(story.id, 'doing')}>Set Doing</button>
               <button onClick={() => handleUpdate(story.id, 'done')}>Set Done</button>
               <button onClick={() => handleDelete(story.id)}>Delete</button>
+              <TaskForm storyId={story.id} onTaskAdded={() => {}} />
+              <TaskKanban storyId={story.id} />
             </li>
           );
         })}

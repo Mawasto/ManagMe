@@ -1,5 +1,6 @@
 import type { Project } from "../models/project";
 import { Story } from '../models/story';
+import type { Task } from '../models/task';
 
 const STORAGE_KEY = "mangme_project";
 
@@ -67,5 +68,30 @@ export class ProjectStorage {
 
     static addProject(project: { id: string; name: string; description: string }): void {
         this.projects.push(project);
+    }
+
+    static tasks: Task[] = [];
+
+    static addTask(task: Task): void {
+        this.tasks.push(task);
+    }
+
+    static getTasksByStory(storyId: string): Task[] {
+        return this.tasks.filter(t => t.storyId === storyId);
+    }
+
+    static getTaskById(taskId: string): Task | undefined {
+        return this.tasks.find(t => t.id === taskId);
+    }
+
+    static updateTask(updatedTask: Task): void {
+        const idx = this.tasks.findIndex(t => t.id === updatedTask.id);
+        if (idx !== -1) {
+            this.tasks[idx] = updatedTask;
+        }
+    }
+
+    static deleteTask(taskId: string): void {
+        this.tasks = this.tasks.filter(t => t.id !== taskId);
     }
 }
