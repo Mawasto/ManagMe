@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ProjectStorage } from '../api/ProjectStorage';
+import { UserManager } from '../api/UserManager';
 
 const StoryList: React.FC = () => {
   const [filter, setFilter] = useState<'todo' | 'doing' | 'done' | 'all'>('all');
@@ -16,7 +17,6 @@ const StoryList: React.FC = () => {
 
   const handleDelete = (id: string) => {
     ProjectStorage.deleteStory(id);
-    alert('Story deleted successfully!');
   };
 
   const handleUpdate = (id: string, newState: 'todo' | 'doing' | 'done') => {
@@ -24,7 +24,6 @@ const StoryList: React.FC = () => {
     if (story) {
       const updatedStory = { ...story, state: newState };
       ProjectStorage.updateStory(updatedStory);
-      alert('Story updated successfully!');
     }
   };
 
@@ -38,18 +37,23 @@ const StoryList: React.FC = () => {
         <button onClick={() => setFilter('done')}>Done</button>
       </div>
       <ul>
-        {filteredStories.map((story) => (
-          <li key={story.id}>
-            <h3>{story.name}</h3>
-            <p>{story.description}</p>
-            <p>Priority: {story.priority}</p>
-            <p>State: {story.state}</p>
-            <button onClick={() => handleUpdate(story.id, 'todo')}>Set To Do</button>
-            <button onClick={() => handleUpdate(story.id, 'doing')}>Set Doing</button>
-            <button onClick={() => handleUpdate(story.id, 'done')}>Set Done</button>
-            <button onClick={() => handleDelete(story.id)}>Delete</button>
-          </li>
-        ))}
+        {filteredStories.map((story) => {
+          const owner = UserManager.getAllUsers().find(u => u.id === story.ownerId);
+          return (
+            <li key={story.id}>
+              <h3>{story.name}</h3>
+              <p>{story.description}</p>
+              <p>Priority: {story.priority}</p>
+              <p>State: {story.state}</p>
+              <p>Created: {new Date(story.creationDate).toLocaleString()}</p>
+              <p>Owner: {owner ? `${owner.firstName} ${owner.lastName}` : story.ownerId}</p>
+              <button onClick={() => handleUpdate(story.id, 'todo')}>Set To Do</button>
+              <button onClick={() => handleUpdate(story.id, 'doing')}>Set Doing</button>
+              <button onClick={() => handleUpdate(story.id, 'done')}>Set Done</button>
+              <button onClick={() => handleDelete(story.id)}>Delete</button>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
