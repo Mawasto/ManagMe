@@ -1,9 +1,7 @@
 import React from "react";
-import { UserManager } from "../api/UserManager";
 
-const UserInfo: React.FC = () => {
-    const user = UserManager.getLoggedInUser();
-
+const UserInfo: React.FC<{ user: any }> = ({ user }) => {
+    if (!user) return null;
     return (
         <div>
             <h2>Logged-in User</h2>
