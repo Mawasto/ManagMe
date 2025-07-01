@@ -18,19 +18,24 @@ const LoginForm: React.FC<{ onLogin: (token: string, refreshToken: string) => vo
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 300, margin: '2rem auto', background: '#222', color: '#fff', padding: 24, borderRadius: 8 }}>
-      <h2>Logowanie</h2>
-      <div>
-        <label>Login:</label>
-        <input value={login} onChange={e => setLogin(e.target.value)} required />
+    <div className="login-bg min-vh-100 d-flex align-items-center justify-content-center" style={{ minHeight: '100vh', width: '100vw' }}>
+      <div className="w-100" style={{ maxWidth: 400 }}>
+        <h1 className="mb-4 fw-bold text-center login-title">ManagMe</h1>
+        <form onSubmit={handleSubmit} className="card shadow p-4" style={{ background: 'var(--bs-body-bg)', color: 'var(--bs-body-color)' }}>
+          <h2 className="mb-3 text-center">Logowanie</h2>
+          <div className="mb-2">
+            <label className="form-label mb-1">Login:</label>
+            <input className="form-control" value={login} onChange={e => setLogin(e.target.value)} required />
+          </div>
+          <div className="mb-2">
+            <label className="form-label mb-1">Hasło:</label>
+            <input className="form-control" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+          </div>
+          {error && <div className="alert alert-danger my-2 p-2 text-center">{error}</div>}
+          <button className="btn btn-primary w-100 mt-2" type="submit">Zaloguj</button>
+        </form>
       </div>
-      <div>
-        <label>Hasło:</label>
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-      </div>
-      {error && <div style={{ color: 'red', margin: '8px 0' }}>{error}</div>}
-      <button type="submit">Zaloguj</button>
-    </form>
+    </div>
   );
 };
 
