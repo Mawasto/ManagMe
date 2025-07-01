@@ -34,10 +34,16 @@ function App() {
   const reloadProjects = () => setRefresh(!refresh);
 
   const handleProjectSelected = (projectId: string) => {
+    if (!projectId) {
+      setCurrentProject(null);
+      ProjectStorage.setCurrentProject('');
+      return;
+    }
     const selectedProject = ProjectStorage.getAll().find(
       (project) => project.id === projectId
     );
     setCurrentProject(selectedProject || null);
+    ProjectStorage.setCurrentProject(projectId);
   };
 
   const handleLogout = () => {
@@ -83,27 +89,35 @@ function App() {
             >
               {theme === 'dark' ? 'Tryb jasny' : 'Tryb ciemny'}
             </button>
+            {/* Wybrany projekt */}
+            <span className="ms-3 fw-semibold">
+              {currentProject ? `Projekt: ${currentProject.name}` : 'Brak wybranego projektu'}
+            </span>
           </div>
-          <button
-            className="btn btn-outline-danger"
-            onClick={handleLogout}
-          >
-            Wyloguj
-          </button>
+          <div className="d-flex align-items-center gap-3">
+            {/* Zalogowany użytkownik */}
+            {user && (
+              <span className="fw-semibold">
+                {user.firstName} {user.lastName}
+              </span>
+            )}
+            <button
+              className="btn btn-outline-danger"
+              onClick={handleLogout}
+            >
+              Wyloguj
+            </button>
+          </div>
         </div>
       </nav>
       <div className="container py-4">
-        <h1>ManagMe – Zarządzanie projektami</h1>
-        {currentProject ? (
-          <p>Wybrany projekt: {currentProject.name}</p>
-        ) : (
-          <p>Nie wybrano projektu</p>
-        )}
-        <UserInfo user={user} />
-        <StoryForm />
-        <StoryList />
-        <ProjectForm onProjectAdded={reloadProjects} />
+        <h1 className="mb-4">ManagMe – Zarządzanie projektami</h1>
         <ProjectList refresh={refresh} onProjectSelected={(projectId) => handleProjectSelected(projectId)} />
+        <ProjectForm onProjectAdded={reloadProjects} />
+        {currentProject && <>
+          <StoryList />
+          <StoryForm />
+        </>}
       </div>
     </div>
   );

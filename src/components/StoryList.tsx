@@ -8,9 +8,9 @@ const StoryList: React.FC = () => {
   const [filter, setFilter] = useState<'todo' | 'doing' | 'done' | 'all'>('all');
 
   const currentProjectId = ProjectStorage.getCurrentProject();
-  const stories = currentProjectId
-    ? ProjectStorage.getStoriesByProject(currentProjectId)
-    : [];
+  if (!currentProjectId) return null;
+
+  const stories = ProjectStorage.getStoriesByProject(currentProjectId);
 
   const filteredStories =
     filter === 'all'

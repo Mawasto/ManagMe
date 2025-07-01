@@ -17,6 +17,10 @@ export function ProjectList({ onProjectSelected, refresh }: ProjectListProps) {
     const handleDelete = (id: string) => {
         ProjectStorage.delete(id);
         setProjects((prevProjects) => prevProjects.filter((project) => project.id !== id));
+        // Jeśli usunięto wybrany projekt, wyczyść wybór w rodzicu
+        if (ProjectStorage.getCurrentProject() === id && onProjectSelected) {
+            onProjectSelected(''); // Przekaż pusty string, aby wyczyścić wybór
+        }
     };
 
     const handleSelectProject = (projectId: string) => {
