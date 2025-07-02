@@ -83,11 +83,11 @@ function App() {
 
   return (
     <div style={{ minHeight: '100vh', height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column', margin: 0, padding: 0, boxSizing: 'border-box', background: 'var(--bs-body-bg)' }}>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm" style={{ borderBottom: '1px solid #dee2e6', position: 'sticky', top: 0, zIndex: 100 }}>
+      <nav className={`navbar navbar-expand-lg mb-4 shadow-sm ${theme === 'dark' ? 'navbar-dark bg-dark' : 'navbar-light bg-light'}`} style={{ borderBottom: '1px solid #dee2e6', position: 'sticky', top: 0, zIndex: 100 }}>
         <div className="container-fluid d-flex justify-content-between align-items-center flex-wrap">
           <div className="d-flex align-items-center gap-2 flex-wrap">
             <button
-              className="btn btn-outline-secondary"
+              className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}
               style={{ position: 'relative', left: 0 }}
               onClick={handleThemeToggle}
               aria-label="Przełącz motyw"
@@ -105,7 +105,7 @@ function App() {
               </span>
             )}
             <button
-              className="btn btn-outline-danger"
+              className={`btn ${theme === 'dark' ? 'btn-outline-danger' : 'btn-outline-secondary'}`}
               onClick={handleLogout}
             >
               Wyloguj
@@ -118,13 +118,13 @@ function App() {
           <h1 className="mb-4 text-center">ManagMe – Zarządzanie projektami</h1>
           <div className="row g-4">
             <div className="col-12 col-md-6">
-              <ProjectList refresh={refresh} onProjectSelected={(projectId) => handleProjectSelected(projectId)} />
-              <ProjectForm onProjectAdded={reloadProjects} />
+              <ProjectList refresh={refresh} onProjectSelected={(projectId) => handleProjectSelected(projectId)} theme={theme} />
+              <ProjectForm onProjectAdded={reloadProjects} theme={theme} />
             </div>
             <div className="col-12 col-md-6">
               {currentProject && <>
-                <StoryList />
-                <StoryForm />
+                <StoryList theme={theme} />
+                <StoryForm theme={theme} />
               </>}
             </div>
           </div>

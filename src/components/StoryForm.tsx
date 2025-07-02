@@ -3,7 +3,11 @@ import { Story } from '../models/story';
 import { ProjectStorage } from '../api/ProjectStorage';
 import { UserManager } from '../api/UserManager';
 
-const StoryForm: React.FC = () => {
+interface StoryFormProps {
+  theme: 'light' | 'dark';
+}
+
+const StoryForm = ({ theme }: StoryFormProps) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('low');
@@ -65,7 +69,7 @@ const StoryForm: React.FC = () => {
           <option value="high">High</option>
         </select>
       </div>
-      <button type="submit">Add Story</button>
+      <button type="submit" className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Add Story</button>
     </form>
   );
 };

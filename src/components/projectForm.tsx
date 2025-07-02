@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { ProjectStorage } from "../api/ProjectStorage";
 
-const ProjectForm: React.FC<{ onProjectAdded: () => void }> = ({ onProjectAdded }) => {
+interface ProjectFormProps {
+  onProjectAdded: () => void;
+  theme: 'light' | 'dark';
+}
+
+const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectAdded, theme }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
@@ -40,7 +45,7 @@ const ProjectForm: React.FC<{ onProjectAdded: () => void }> = ({ onProjectAdded 
           required
         ></textarea>
       </div>
-      <button type="submit">Zapisz</button>
+      <button type="submit" className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Zapisz</button>
     </form>
   );
 };

@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { Task } from '../models/task';
 import { ProjectStorage } from '../api/ProjectStorage';
 
-const TaskForm: React.FC<{ storyId: string; onTaskAdded: () => void }> = ({ storyId, onTaskAdded }) => {
+interface TaskFormProps {
+  storyId: string;
+  onTaskAdded: () => void;
+  theme: 'light' | 'dark';
+}
+
+const TaskForm: React.FC<TaskFormProps> = ({ storyId, onTaskAdded, theme }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('low');
@@ -51,7 +57,7 @@ const TaskForm: React.FC<{ storyId: string; onTaskAdded: () => void }> = ({ stor
         <label>Estimated hours:</label>
         <input type="number" min={1} value={estimatedHours} onChange={e => setEstimatedHours(Number(e.target.value))} required />
       </div>
-      <button type="submit">Add Task</button>
+      <button type="submit" className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Add Task</button>
     </form>
   );
 };

@@ -3,11 +3,12 @@ import { ProjectStorage } from "../api/ProjectStorage";
 import type { Project } from "../models/project";
 
 interface ProjectListProps {
-    onProjectSelected?: (projectId: string) => void;
+    onProjectSelected: (projectId: string) => void;
     refresh: boolean; // Add refresh prop type
+    theme: 'light' | 'dark';
 }
 
-export function ProjectList({ onProjectSelected, refresh }: ProjectListProps) {
+export function ProjectList({ onProjectSelected, refresh, theme }: ProjectListProps) {
     const [projects, setProjects] = useState<Project[]>(ProjectStorage.getAll());
 
     useEffect(() => {
@@ -38,8 +39,8 @@ export function ProjectList({ onProjectSelected, refresh }: ProjectListProps) {
                 {projects.map((project) => (
                     <li key={project.id}>
                         <strong>{project.name}</strong> - {project.description}
-                        <button onClick={() => handleSelectProject(project.id)}>Wybierz projekt</button>
-                        <button onClick={() => handleDelete(project.id)}>Usuń</button>
+                        <button onClick={() => handleSelectProject(project.id)} className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Wybierz projekt</button>
+                        <button onClick={() => handleDelete(project.id)} className={`btn ${theme === 'dark' ? 'btn-outline-danger' : 'btn-outline-secondary'}`}>Usuń</button>
                     </li>
                 ))}
             </ul>

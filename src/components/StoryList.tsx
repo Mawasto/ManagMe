@@ -4,7 +4,11 @@ import { UserManager } from '../api/UserManager';
 import TaskKanban from './TaskKanban';
 import TaskForm from './TaskForm';
 
-const StoryList: React.FC = () => {
+interface StoryListProps {
+  theme: 'light' | 'dark';
+}
+
+const StoryList = ({ theme }: StoryListProps) => {
   const [filter, setFilter] = useState<'todo' | 'doing' | 'done' | 'all'>('all');
   const [stories, setStories] = useState(ProjectStorage.getStoriesByProject(ProjectStorage.getCurrentProject()!));
   const currentProjectId = ProjectStorage.getCurrentProject();
@@ -41,10 +45,10 @@ const StoryList: React.FC = () => {
     <div>
       <h2>Project Stories</h2>
       <div>
-        <button onClick={() => setFilter('all')}>All</button>
-        <button onClick={() => setFilter('todo')}>To Do</button>
-        <button onClick={() => setFilter('doing')}>Doing</button>
-        <button onClick={() => setFilter('done')}>Done</button>
+        <button onClick={() => setFilter('all')} className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>All</button>
+        <button onClick={() => setFilter('todo')} className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>To Do</button>
+        <button onClick={() => setFilter('doing')} className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Doing</button>
+        <button onClick={() => setFilter('done')} className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Done</button>
       </div>
       <ul>
         {filteredStories.map((story) => {
@@ -57,12 +61,12 @@ const StoryList: React.FC = () => {
               <p>State: {story.state}</p>
               <p>Created: {new Date(story.creationDate).toLocaleString()}</p>
               <p>Owner: {owner ? `${owner.firstName} ${owner.lastName}` : story.ownerId}</p>
-              <button onClick={() => handleUpdate(story.id, 'todo')}>Set To Do</button>
-              <button onClick={() => handleUpdate(story.id, 'doing')}>Set Doing</button>
-              <button onClick={() => handleUpdate(story.id, 'done')}>Set Done</button>
-              <button onClick={() => handleDelete(story.id)}>Delete</button>
-              <TaskForm storyId={story.id} onTaskAdded={() => setStories(ProjectStorage.getStoriesByProject(currentProjectId))} />
-              <TaskKanban storyId={story.id} />
+              <button onClick={() => handleUpdate(story.id, 'todo')} className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Set To Do</button>
+              <button onClick={() => handleUpdate(story.id, 'doing')} className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Set Doing</button>
+              <button onClick={() => handleUpdate(story.id, 'done')} className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Set Done</button>
+              <button onClick={() => handleDelete(story.id)} className={`btn ${theme === 'dark' ? 'btn-outline-danger' : 'btn-outline-secondary'}`}>Delete</button>
+              <TaskForm theme={theme} storyId={story.id} onTaskAdded={() => setStories(ProjectStorage.getStoriesByProject(currentProjectId))} />
+              <TaskKanban storyId={story.id} theme={theme} />
             </li>
           );
         })}
