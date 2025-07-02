@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ProjectStorage } from '../api/ProjectStorage';
 import { UserManager } from '../api/UserManager';
 import { Task } from '../models/task';
@@ -6,6 +6,13 @@ import { Task } from '../models/task';
 const TaskKanban: React.FC<{ storyId: string }> = ({ storyId }) => {
   const [tasks, setTasks] = useState<Task[]>(ProjectStorage.getTasksByStory(storyId));
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTasks(ProjectStorage.getTasksByStory(storyId));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [storyId]);
 
   const refresh = () => setTasks(ProjectStorage.getTasksByStory(storyId));
 

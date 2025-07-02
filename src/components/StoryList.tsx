@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ProjectStorage } from '../api/ProjectStorage';
 import { UserManager } from '../api/UserManager';
 import TaskKanban from './TaskKanban';
@@ -6,11 +6,17 @@ import TaskForm from './TaskForm';
 
 const StoryList: React.FC = () => {
   const [filter, setFilter] = useState<'todo' | 'doing' | 'done' | 'all'>('all');
-
+  const [stories, setStories] = useState(ProjectStorage.getStoriesByProject(ProjectStorage.getCurrentProject()!));
   const currentProjectId = ProjectStorage.getCurrentProject();
-  if (!currentProjectId) return null;
 
-  const stories = ProjectStorage.getStoriesByProject(currentProjectId);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStories(ProjectStorage.getStoriesByProject(ProjectStorage.getCurrentProject()!));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [currentProjectId]);
+
+  if (!currentProjectId) return null;
 
   const filteredStories =
     filter === 'all'
@@ -19,6 +25,7 @@ const StoryList: React.FC = () => {
 
   const handleDelete = (id: string) => {
     ProjectStorage.deleteStory(id);
+    setStories(ProjectStorage.getStoriesByProject(currentProjectId));
   };
 
   const handleUpdate = (id: string, newState: 'todo' | 'doing' | 'done') => {
@@ -26,6 +33,7 @@ const StoryList: React.FC = () => {
     if (story) {
       const updatedStory = { ...story, state: newState };
       ProjectStorage.updateStory(updatedStory);
+      setStories(ProjectStorage.getStoriesByProject(currentProjectId));
     }
   };
 
@@ -53,7 +61,7 @@ const StoryList: React.FC = () => {
               <button onClick={() => handleUpdate(story.id, 'doing')}>Set Doing</button>
               <button onClick={() => handleUpdate(story.id, 'done')}>Set Done</button>
               <button onClick={() => handleDelete(story.id)}>Delete</button>
-              <TaskForm storyId={story.id} onTaskAdded={() => {}} />
+              <TaskForm storyId={story.id} onTaskAdded={() => setStories(ProjectStorage.getStoriesByProject(currentProjectId))} />
               <TaskKanban storyId={story.id} />
             </li>
           );

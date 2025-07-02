@@ -31,6 +31,11 @@ function App() {
     }
   }, [token]);
 
+  useEffect(() => {
+    ProjectStorage.loadStories();
+    ProjectStorage.loadTasks();
+  }, []);
+
   const reloadProjects = () => setRefresh(!refresh);
 
   const handleProjectSelected = (projectId: string) => {

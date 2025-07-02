@@ -3,6 +3,8 @@ import { Story } from '../models/story';
 import type { Task } from '../models/task';
 
 const STORAGE_KEY = "mangme_project";
+const STORIES_KEY = "managme_stories";
+const TASKS_KEY = "managme_tasks";
 
 export class ProjectStorage {
     private static currentProjectId: string | null = null;
@@ -17,19 +19,31 @@ export class ProjectStorage {
 
     static stories: Story[] = [];
 
+    static loadStories(): void {
+        const data = localStorage.getItem(STORIES_KEY);
+        this.stories = data ? JSON.parse(data) : [];
+    }
+
+    static saveStories(): void {
+        localStorage.setItem(STORIES_KEY, JSON.stringify(this.stories));
+    }
+
     static addStory(story: Story): void {
         this.stories.push(story);
+        this.saveStories();
     }
 
     static updateStory(updatedStory: Story): void {
         const index = this.stories.findIndex(s => s.id === updatedStory.id);
         if (index !== -1) {
             this.stories[index] = updatedStory;
+            this.saveStories();
         }
     }
 
     static deleteStory(storyId: string): void {
         this.stories = this.stories.filter(s => s.id !== storyId);
+        this.saveStories();
     }
 
     static getStoriesByProject(projectId: string): Story[] {
@@ -72,8 +86,18 @@ export class ProjectStorage {
 
     static tasks: Task[] = [];
 
+    static loadTasks(): void {
+        const data = localStorage.getItem(TASKS_KEY);
+        this.tasks = data ? JSON.parse(data) : [];
+    }
+
+    static saveTasks(): void {
+        localStorage.setItem(TASKS_KEY, JSON.stringify(this.tasks));
+    }
+
     static addTask(task: Task): void {
         this.tasks.push(task);
+        this.saveTasks();
     }
 
     static getTasksByStory(storyId: string): Task[] {
@@ -88,10 +112,12 @@ export class ProjectStorage {
         const idx = this.tasks.findIndex(t => t.id === updatedTask.id);
         if (idx !== -1) {
             this.tasks[idx] = updatedTask;
+            this.saveTasks();
         }
     }
 
     static deleteTask(taskId: string): void {
         this.tasks = this.tasks.filter(t => t.id !== taskId);
+        this.saveTasks();
     }
 }
