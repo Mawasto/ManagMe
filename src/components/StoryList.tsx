@@ -4,6 +4,8 @@ import { UserManager } from '../api/UserManager';
 import TaskKanban from './TaskKanban';
 import TaskForm from './TaskForm';
 import { Story } from '../models/story';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
 
 interface StoryListProps {
   theme: 'light' | 'dark';
@@ -16,11 +18,11 @@ const StoryList = ({ theme }: StoryListProps) => {
 
   useEffect(() => {
     if (!currentProjectId) return;
-    async function fetchStories() {
-      const data = await ProjectStorage.getStoriesByProject(currentProjectId!);
-      setStories(data);
-    }
-    fetchStories();
+    const q = query(collection(db, 'stories'), where('projectId', '==', currentProjectId));
+    const unsub = onSnapshot(q, (querySnapshot) => {
+      setStories(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Story)));
+    });
+    return () => unsub();
   }, [currentProjectId]);
 
   if (!currentProjectId) return null;
@@ -33,7 +35,7 @@ const StoryList = ({ theme }: StoryListProps) => {
   const handleDelete = async (id: string) => {
     await ProjectStorage.deleteStory(id);
     if (currentProjectId) {
-      const data = await ProjectStorage.getStoriesByProject(currentProjectId!);
+      const data = await ProjectStorage.getStoriesByProject(currentProjectId);
       setStories(data);
     }
   };
@@ -73,13 +75,12 @@ const StoryList = ({ theme }: StoryListProps) => {
               <button onClick={() => handleUpdate(story.id, 'done')} className="btn btn-sm btn-outline-success me-1">Done</button>
               <button onClick={() => handleDelete(story.id)} className="btn btn-sm btn-outline-danger">Delete</button>
               <TaskKanban theme={theme} storyId={story.id} />
-              <TaskForm storyId={story.id} onTaskAdded={async () => {
-                // Optionally refresh tasks here if needed
-              }} theme={theme} />
+              <TaskForm storyId={story.id} onTaskAdded={() => setRefreshStories((r) => !r)} theme={theme} />
             </li>
           );
         })}
       </ul>
+      {/* Usunięto StoryForm z dołu, bo jest już wyżej w layoucie głównym */}
     </div>
   );
 };

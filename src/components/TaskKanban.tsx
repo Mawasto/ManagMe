@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ProjectStorage } from '../api/ProjectStorage';
 import { UserManager } from '../api/UserManager';
 import { Task } from '../models/task';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
 
 interface TaskKanbanProps {
   theme: 'light' | 'dark';
@@ -14,11 +16,11 @@ const TaskKanban: React.FC<TaskKanbanProps> = ({ theme, storyId }) => {
 
     useEffect(() => {
         if (!storyId) return;
-        async function fetchTasks() {
-            const data = await ProjectStorage.getTasksByStory(storyId!);
-            setTasks(data);
-        }
-        fetchTasks();
+        const q = query(collection(db, 'tasks'), where('storyId', '==', storyId));
+        const unsub = onSnapshot(q, (querySnapshot) => {
+            setTasks(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task)));
+        });
+        return () => unsub();
     }, [storyId]);
 
     const refresh = async () => {
@@ -51,7 +53,10 @@ const TaskKanban: React.FC<TaskKanbanProps> = ({ theme, storyId }) => {
 
     const handleDelete = async (taskId: string) => {
         await ProjectStorage.deleteTask(taskId);
-        refresh();
+        if (storyId) {
+          const data = await ProjectStorage.getTasksByStory(storyId);
+          setTasks(data);
+        }
     };
 
     const devUsers = UserManager.getAllUsers().filter(u => u.role === 'developer' || u.role === 'devops');

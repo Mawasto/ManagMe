@@ -22,7 +22,8 @@ export function ProjectList({ onProjectSelected, refresh, theme }: ProjectListPr
 
     const handleDelete = async (id: string) => {
         await ProjectStorage.delete(id);
-        setProjects((prevProjects) => prevProjects.filter((project) => project.id !== id));
+        const data = await ProjectStorage.getAll();
+        setProjects(data);
         // Jeśli usunięto wybrany projekt, wyczyść wybór w rodzicu
         if (ProjectStorage.getCurrentProject() === id && onProjectSelected) {
             onProjectSelected(''); // Przekaż pusty string, aby wyczyścić wybór

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ProjectStorage } from "../api/ProjectStorage";
+import type { NewProject } from "../models/project";
 
 interface ProjectFormProps {
   onProjectAdded: () => void;
@@ -12,8 +13,7 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectAdded, theme }) => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const newProject = {
-      id: Date.now().toString(),
+    const newProject: NewProject = {
       name,
       description,
     };

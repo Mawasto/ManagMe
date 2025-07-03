@@ -5,9 +5,10 @@ import { UserManager } from '../api/UserManager';
 
 interface StoryFormProps {
   theme: 'light' | 'dark';
+  onStoryAdded?: () => void;
 }
 
-const StoryForm = ({ theme }: StoryFormProps) => {
+const StoryForm = ({ theme, onStoryAdded }: StoryFormProps) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('low');
@@ -36,6 +37,7 @@ const StoryForm = ({ theme }: StoryFormProps) => {
     setName('');
     setDescription('');
     setPriority('low');
+    if (onStoryAdded) onStoryAdded();
   };
 
   return (
@@ -58,7 +60,7 @@ const StoryForm = ({ theme }: StoryFormProps) => {
           onChange={(e) => setDescription(e.target.value)}
           required
           className={`form-control ${theme === 'dark' ? 'bg-dark text-light border-secondary' : ''}`}
-        ></textarea>
+        />
       </div>
       <div className="mb-3 text-start">
         <label className="form-label">Priority:</label>

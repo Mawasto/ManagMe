@@ -31,8 +31,9 @@ export class ProjectStorage {
         return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project));
     }
 
-    static async add(project: Project): Promise<void> {
-        await addDoc(collection(db, 'projects'), project);
+    static async add(project: Omit<Project, 'id'>): Promise<string> {
+        const docRef = await addDoc(collection(db, 'projects'), project);
+        return docRef.id;
     }
 
     static async update(updatedProject: Project): Promise<void> {
