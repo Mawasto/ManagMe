@@ -42,9 +42,10 @@ const StoryForm = ({ theme, onStoryAdded }: StoryFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className={`p-3 rounded shadow-sm border ${theme === 'dark' ? 'bg-dark text-light border-secondary' : 'bg-body-tertiary text-dark border'}`}>
-      <h2 className="mb-3">Add New Story</h2>
+      <h2 className="mb-3">Dodaj nową historyjkę
+      </h2>
       <div className="mb-3 text-start">
-        <label className="form-label">Name:</label>
+        <label className="form-label">Nazwa:</label>
         <input
           type="text"
           value={name}
@@ -54,7 +55,7 @@ const StoryForm = ({ theme, onStoryAdded }: StoryFormProps) => {
         />
       </div>
       <div className="mb-3 text-start">
-        <label className="form-label">Description:</label>
+        <label className="form-label">Opis:</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -63,18 +64,18 @@ const StoryForm = ({ theme, onStoryAdded }: StoryFormProps) => {
         />
       </div>
       <div className="mb-3 text-start">
-        <label className="form-label">Priority:</label>
+        <label className="form-label">Priorytet:</label>
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
           className={`form-select ${theme === 'dark' ? 'bg-dark text-light border-secondary' : ''}`}
         >
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
+          <option value="low">Niski</option>
+          <option value="medium">Średni</option>
+          <option value="high">Wysoki</option>
         </select>
       </div>
-      <button type="submit" className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Add Story</button>
+      <button type="submit" className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Dodaj zadanie</button>
     </form>
   );
 };

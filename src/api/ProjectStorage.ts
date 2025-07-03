@@ -1,14 +1,14 @@
 import { db } from '../firebase';
 import {
-  collection,
-  getDocs,
-  addDoc,
-  doc,
-  deleteDoc,
-  updateDoc,
-  getDoc,
-  query,
-  where
+    collection,
+    getDocs,
+    addDoc,
+    doc,
+    deleteDoc,
+    updateDoc,
+    getDoc,
+    query,
+    where
 } from 'firebase/firestore';
 import type { Project } from "../models/project";
 import { Story } from '../models/story';
@@ -43,7 +43,19 @@ export class ProjectStorage {
     }
 
     static async delete(id: string): Promise<void> {
+        // Usuń projekt
         await deleteDoc(doc(db, 'projects', id));
+        // Usuń powiązane stories
+        const storiesSnapshot = await getDocs(query(collection(db, 'stories'), where('projectId', '==', id)));
+        const storyIds = storiesSnapshot.docs.map(doc => doc.id);
+        for (const storyId of storyIds) {
+            await deleteDoc(doc(db, 'stories', storyId));
+            // Usuń powiązane tasks dla każdej story
+            const tasksSnapshot = await getDocs(query(collection(db, 'tasks'), where('storyId', '==', storyId)));
+            for (const taskDoc of tasksSnapshot.docs) {
+                await deleteDoc(doc(db, 'tasks', taskDoc.id));
+            }
+        }
     }
 
     // STORIES

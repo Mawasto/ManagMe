@@ -20,6 +20,7 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
@@ -34,7 +35,8 @@ body {
   color: var(--bs-body-color);
 }
 
-html, body {
+html,
+body {
   background-color: var(--bs-body-bg) !important;
   color: var(--bs-body-color);
 }
@@ -56,9 +58,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -69,6 +73,7 @@ button:focus-visible {
   --bs-body-bg: #181a1b;
   --bs-body-color: #f8f9fa;
 }
+
 :root[data-theme='light'] {
   color-scheme: light;
   --bs-body-bg: #fff;
@@ -80,9 +85,11 @@ button:focus-visible {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
     color: #747bff;
   }
+
   button {
     background-color: #f9f9f9;
   }
@@ -94,7 +101,9 @@ button:focus-visible {
   border-bottom: 1px solid #444 !important;
 }
 
-.navbar .btn, .navbar .btn:focus, .navbar .btn:active {
+.navbar .btn,
+.navbar .btn:focus,
+.navbar .btn:active {
   color: var(--bs-body-color) !important;
   background: transparent !important;
   border-color: var(--bs-body-color) !important;
@@ -133,7 +142,9 @@ button:focus-visible {
   border: 1px solid #222 !important;
 }
 
-.form-label, .form-control, .alert {
+.form-label,
+.form-control,
+.alert {
   color: var(--bs-body-color) !important;
   background: var(--bs-body-bg) !important;
 }
