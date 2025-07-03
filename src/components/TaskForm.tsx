@@ -35,27 +35,27 @@ const TaskForm: React.FC<TaskFormProps> = ({ storyId, onTaskAdded, theme }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ margin: '16px 0' }}>
-      <h3>Add Task</h3>
-      <div>
-        <label>Name:</label>
-        <input value={name} onChange={e => setName(e.target.value)} required />
+    <form onSubmit={handleSubmit} className={`p-3 rounded shadow-sm border ${theme === 'dark' ? 'bg-dark text-light border-secondary' : 'bg-body-tertiary text-dark border'}`} style={{ margin: '16px 0' }}>
+      <h3 className="mb-3">Add Task</h3>
+      <div className="mb-3 text-start">
+        <label className="form-label">Name:</label>
+        <input value={name} onChange={e => setName(e.target.value)} required className={`form-control ${theme === 'dark' ? 'bg-dark text-light border-secondary' : ''}`} />
       </div>
-      <div>
-        <label>Description:</label>
-        <input value={description} onChange={e => setDescription(e.target.value)} required />
+      <div className="mb-3 text-start">
+        <label className="form-label">Description:</label>
+        <input value={description} onChange={e => setDescription(e.target.value)} required className={`form-control ${theme === 'dark' ? 'bg-dark text-light border-secondary' : ''}`} />
       </div>
-      <div>
-        <label>Priority:</label>
-        <select value={priority} onChange={e => setPriority(e.target.value as 'low' | 'medium' | 'high')}>
+      <div className="mb-3 text-start">
+        <label className="form-label">Priority:</label>
+        <select value={priority} onChange={e => setPriority(e.target.value as 'low' | 'medium' | 'high')} className={`form-select ${theme === 'dark' ? 'bg-dark text-light border-secondary' : ''}`}>
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
         </select>
       </div>
-      <div>
-        <label>Estimated hours:</label>
-        <input type="number" min={1} value={estimatedHours} onChange={e => setEstimatedHours(Number(e.target.value))} required />
+      <div className="mb-3 text-start">
+        <label className="form-label">Estimated hours:</label>
+        <input type="number" min={1} value={estimatedHours} onChange={e => setEstimatedHours(Number(e.target.value))} required className={`form-control ${theme === 'dark' ? 'bg-dark text-light border-secondary' : ''}`} />
       </div>
       <button type="submit" className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Add Task</button>
     </form>

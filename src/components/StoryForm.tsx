@@ -39,30 +39,33 @@ const StoryForm = ({ theme }: StoryFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Add New Story</h2>
-      <div>
-        <label>Name:</label>
+    <form onSubmit={handleSubmit} className={`p-3 rounded shadow-sm border ${theme === 'dark' ? 'bg-dark text-light border-secondary' : 'bg-body-tertiary text-dark border'}`}>
+      <h2 className="mb-3">Add New Story</h2>
+      <div className="mb-3 text-start">
+        <label className="form-label">Name:</label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          className={`form-control ${theme === 'dark' ? 'bg-dark text-light border-secondary' : ''}`}
         />
       </div>
-      <div>
-        <label>Description:</label>
+      <div className="mb-3 text-start">
+        <label className="form-label">Description:</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
+          className={`form-control ${theme === 'dark' ? 'bg-dark text-light border-secondary' : ''}`}
         ></textarea>
       </div>
-      <div>
-        <label>Priority:</label>
+      <div className="mb-3 text-start">
+        <label className="form-label">Priority:</label>
         <select
           value={priority}
           onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
+          className={`form-select ${theme === 'dark' ? 'bg-dark text-light border-secondary' : ''}`}
         >
           <option value="low">Low</option>
           <option value="medium">Medium</option>

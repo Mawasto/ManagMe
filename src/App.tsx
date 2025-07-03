@@ -114,17 +114,17 @@ function App() {
         </div>
       </nav>
       <main className="flex-grow-1 d-flex flex-column align-items-center w-100" style={{ flex: 1, width: '100%', margin: 0, padding: 0 }}>
-        <div className="container py-4" style={{ flex: 1, maxWidth: 900, width: '100%' }}>
+        <div className="container-fluid py-4" style={{ flex: 1, width: '100%' }}>
           <h1 className="mb-4 text-center">ManagMe – Zarządzanie projektami</h1>
           <div className="row g-4">
             <div className="col-12 col-md-6">
-              <ProjectList refresh={refresh} onProjectSelected={(projectId) => handleProjectSelected(projectId)} theme={theme} />
               <ProjectForm onProjectAdded={reloadProjects} theme={theme} />
+              <ProjectList refresh={refresh} onProjectSelected={(projectId) => handleProjectSelected(projectId)} theme={theme} />
             </div>
             <div className="col-12 col-md-6">
               {currentProject && <>
-                <StoryList theme={theme} />
                 <StoryForm theme={theme} />
+                <StoryList theme={theme} />
               </>}
             </div>
           </div>

@@ -67,6 +67,9 @@ const TaskKanban: React.FC<TaskKanbanProps> = ({ theme, storyId }) => {
         </div>
     );
 
+    const hasTasks = tasks.length > 0;
+    if (!hasTasks) return null;
+
     return (
         <div style={{ display: 'flex', gap: 16 }}>
             {['todo', 'doing', 'done'].map(state => (
@@ -76,7 +79,7 @@ const TaskKanban: React.FC<TaskKanbanProps> = ({ theme, storyId }) => {
                 </div>
             ))}
             {selectedTask && (
-                <div style={{ position: 'fixed', top: 40, right: 40, background: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#222', padding: 24, borderRadius: 8, zIndex: 1000 }}>
+                <div style={{ position: 'fixed', top: 40, right: 40, background: theme === 'dark' ? '#333' : '#fff', color: theme === 'dark' ? '#fff' : '#222', padding: 24, borderRadius: 8, zIndex: 1000, border: theme === 'light' ? '2px solid #222' : 'none' }}>
                     <h2>Task Details</h2>
                     <div><b>Name:</b> {selectedTask.name}</div>
                     <div><b>Description:</b> {selectedTask.description}</div>
