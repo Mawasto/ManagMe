@@ -75,7 +75,7 @@ const StoryForm = ({ theme, onStoryAdded }: StoryFormProps) => {
           <option value="high">Wysoki</option>
         </select>
       </div>
-      <button type="submit" className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Dodaj zadanie</button>
+      <button type="submit" className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Dodaj historyjkę</button>
     </form>
   );
 };

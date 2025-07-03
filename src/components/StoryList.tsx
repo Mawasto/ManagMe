@@ -14,6 +14,7 @@ interface StoryListProps {
 const StoryList = ({ theme }: StoryListProps) => {
   const [filter, setFilter] = useState<'todo' | 'doing' | 'done' | 'all'>('all');
   const [stories, setStories] = useState<Story[]>([]);
+  const [refreshStories, setRefreshStories] = useState(false);
   const currentProjectId = ProjectStorage.getCurrentProject();
 
   useEffect(() => {
