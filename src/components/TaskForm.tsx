@@ -14,7 +14,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ storyId, onTaskAdded, theme }) => {
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('low');
   const [estimatedHours, setEstimatedHours] = useState(1);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newTask = new Task(
       Date.now().toString(),
@@ -26,7 +26,7 @@ const TaskForm: React.FC<TaskFormProps> = ({ storyId, onTaskAdded, theme }) => {
       'todo',
       new Date()
     );
-    ProjectStorage.addTask(newTask);
+    await ProjectStorage.addTask(newTask);
     setName('');
     setDescription('');
     setPriority('low');

@@ -3,6 +3,7 @@ import { ProjectStorage } from '../api/ProjectStorage';
 import { UserManager } from '../api/UserManager';
 import TaskKanban from './TaskKanban';
 import TaskForm from './TaskForm';
+import { Story } from '../models/story';
 
 interface StoryListProps {
   theme: 'light' | 'dark';
@@ -10,14 +11,16 @@ interface StoryListProps {
 
 const StoryList = ({ theme }: StoryListProps) => {
   const [filter, setFilter] = useState<'todo' | 'doing' | 'done' | 'all'>('all');
-  const [stories, setStories] = useState(ProjectStorage.getStoriesByProject(ProjectStorage.getCurrentProject()!));
+  const [stories, setStories] = useState<Story[]>([]);
   const currentProjectId = ProjectStorage.getCurrentProject();
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setStories(ProjectStorage.getStoriesByProject(ProjectStorage.getCurrentProject()!));
-    }, 1000);
-    return () => clearInterval(interval);
+    if (!currentProjectId) return;
+    async function fetchStories() {
+      const data = await ProjectStorage.getStoriesByProject(currentProjectId!);
+      setStories(data);
+    }
+    fetchStories();
   }, [currentProjectId]);
 
   if (!currentProjectId) return null;
@@ -27,22 +30,28 @@ const StoryList = ({ theme }: StoryListProps) => {
       ? stories
       : stories.filter((story) => story.state === filter);
 
-  const handleDelete = (id: string) => {
-    ProjectStorage.deleteStory(id);
-    setStories(ProjectStorage.getStoriesByProject(currentProjectId));
+  const handleDelete = async (id: string) => {
+    await ProjectStorage.deleteStory(id);
+    if (currentProjectId) {
+      const data = await ProjectStorage.getStoriesByProject(currentProjectId!);
+      setStories(data);
+    }
   };
 
-  const handleUpdate = (id: string, newState: 'todo' | 'doing' | 'done') => {
+  const handleUpdate = async (id: string, newState: 'todo' | 'doing' | 'done') => {
     const story = stories.find((s) => s.id === id);
     if (story) {
       const updatedStory = { ...story, state: newState };
-      ProjectStorage.updateStory(updatedStory);
-      setStories(ProjectStorage.getStoriesByProject(currentProjectId));
+      await ProjectStorage.updateStory(updatedStory);
+      if (currentProjectId) {
+        const data = await ProjectStorage.getStoriesByProject(currentProjectId!);
+        setStories(data);
+      }
     }
   };
 
   return (
-    <div>
+    <div className={`p-3 rounded shadow-sm border mt-2 ${theme === 'dark' ? 'bg-dark text-light border-secondary' : 'bg-body-tertiary text-dark border'}`} style={{ minWidth: 340 }}>
       <h2>Project Stories</h2>
       <div>
         <button onClick={() => setFilter('all')} className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>All</button>
@@ -58,15 +67,15 @@ const StoryList = ({ theme }: StoryListProps) => {
               <h3>{story.name}</h3>
               <p>{story.description}</p>
               <p>Priority: {story.priority}</p>
-              <p>State: {story.state}</p>
-              <p>Created: {new Date(story.creationDate).toLocaleString()}</p>
-              <p>Owner: {owner ? `${owner.firstName} ${owner.lastName}` : story.ownerId}</p>
-              <button onClick={() => handleUpdate(story.id, 'todo')} className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Set To Do</button>
-              <button onClick={() => handleUpdate(story.id, 'doing')} className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Set Doing</button>
-              <button onClick={() => handleUpdate(story.id, 'done')} className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Set Done</button>
-              <button onClick={() => handleDelete(story.id)} className={`btn ${theme === 'dark' ? 'btn-outline-danger' : 'btn-outline-secondary'}`}>Delete</button>
-              <TaskForm theme={theme} storyId={story.id} onTaskAdded={() => setStories(ProjectStorage.getStoriesByProject(currentProjectId))} />
-              <TaskKanban storyId={story.id} theme={theme} />
+              <p>Owner: {owner ? `${owner.firstName} ${owner.lastName}` : 'Unknown'}</p>
+              <button onClick={() => handleUpdate(story.id, 'todo')} className="btn btn-sm btn-outline-primary me-1">To Do</button>
+              <button onClick={() => handleUpdate(story.id, 'doing')} className="btn btn-sm btn-outline-warning me-1">Doing</button>
+              <button onClick={() => handleUpdate(story.id, 'done')} className="btn btn-sm btn-outline-success me-1">Done</button>
+              <button onClick={() => handleDelete(story.id)} className="btn btn-sm btn-outline-danger">Delete</button>
+              <TaskKanban theme={theme} storyId={story.id} />
+              <TaskForm storyId={story.id} onTaskAdded={async () => {
+                // Optionally refresh tasks here if needed
+              }} theme={theme} />
             </li>
           );
         })}

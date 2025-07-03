@@ -31,22 +31,16 @@ function App() {
     }
   }, [token]);
 
-  useEffect(() => {
-    ProjectStorage.loadStories();
-    ProjectStorage.loadTasks();
-  }, []);
-
   const reloadProjects = () => setRefresh(!refresh);
 
-  const handleProjectSelected = (projectId: string) => {
+  const handleProjectSelected = async (projectId: string) => {
     if (!projectId) {
       setCurrentProject(null);
       ProjectStorage.setCurrentProject('');
       return;
     }
-    const selectedProject = ProjectStorage.getAll().find(
-      (project) => project.id === projectId
-    );
+    const projects = await ProjectStorage.getAll();
+    const selectedProject = projects.find((project) => project.id === projectId);
     setCurrentProject(selectedProject || null);
     ProjectStorage.setCurrentProject(projectId);
   };

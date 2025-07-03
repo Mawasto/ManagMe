@@ -12,7 +12,7 @@ const StoryForm = ({ theme }: StoryFormProps) => {
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('low');
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     const currentProjectId = ProjectStorage.getCurrentProject();
@@ -32,7 +32,7 @@ const StoryForm = ({ theme }: StoryFormProps) => {
       UserManager.getLoggedInUser().id
     );
 
-    ProjectStorage.addStory(newStory);
+    await ProjectStorage.addStory(newStory);
     setName('');
     setDescription('');
     setPriority('low');

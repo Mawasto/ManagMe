@@ -10,16 +10,14 @@ const ProjectForm: React.FC<ProjectFormProps> = ({ onProjectAdded, theme }) => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
     const newProject = {
       id: Date.now().toString(),
       name,
       description,
     };
-
-    ProjectStorage.add(newProject);
+    await ProjectStorage.add(newProject);
     setName("");
     setDescription("");
     onProjectAdded();

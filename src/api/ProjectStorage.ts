@@ -1,10 +1,18 @@
+import { db } from '../firebase';
+import {
+  collection,
+  getDocs,
+  addDoc,
+  doc,
+  deleteDoc,
+  updateDoc,
+  getDoc,
+  query,
+  where
+} from 'firebase/firestore';
 import type { Project } from "../models/project";
 import { Story } from '../models/story';
 import type { Task } from '../models/task';
-
-const STORAGE_KEY = "mangme_project";
-const STORIES_KEY = "managme_stories";
-const TASKS_KEY = "managme_tasks";
 
 export class ProjectStorage {
     private static currentProjectId: string | null = null;
@@ -17,107 +25,104 @@ export class ProjectStorage {
         return this.currentProjectId;
     }
 
-    static stories: Story[] = [];
-
-    static loadStories(): void {
-        const data = localStorage.getItem(STORIES_KEY);
-        this.stories = data ? JSON.parse(data) : [];
+    // PROJECTS
+    static async getAll(): Promise<Project[]> {
+        const querySnapshot = await getDocs(collection(db, 'projects'));
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Project));
     }
 
-    static saveStories(): void {
-        localStorage.setItem(STORIES_KEY, JSON.stringify(this.stories));
+    static async add(project: Project): Promise<void> {
+        await addDoc(collection(db, 'projects'), project);
     }
 
-    static addStory(story: Story): void {
-        this.stories.push(story);
-        this.saveStories();
+    static async update(updatedProject: Project): Promise<void> {
+        if (!updatedProject.id) return;
+        const { id, ...data } = updatedProject;
+        await updateDoc(doc(db, 'projects', id), data);
     }
 
-    static updateStory(updatedStory: Story): void {
-        const index = this.stories.findIndex(s => s.id === updatedStory.id);
-        if (index !== -1) {
-            this.stories[index] = updatedStory;
-            this.saveStories();
+    static async delete(id: string): Promise<void> {
+        await deleteDoc(doc(db, 'projects', id));
+    }
+
+    // STORIES
+    static async getStoriesByProject(projectId: string): Promise<Story[]> {
+        const q = query(collection(db, 'stories'), where('projectId', '==', projectId));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Story));
+    }
+
+    static async addStory(story: Story): Promise<void> {
+        // Convert Story instance to plain object
+        const { id, creationDate, ...data } = story;
+        await addDoc(collection(db, 'stories'), {
+            ...data,
+            creationDate: creationDate instanceof Date ? creationDate.toISOString() : creationDate,
+            projectId: story.projectId,
+            state: story.state,
+            ownerId: story.ownerId,
+            name: story.name,
+            description: story.description,
+            priority: story.priority
+        });
+    }
+
+    static async updateStory(updatedStory: Story): Promise<void> {
+        if (!updatedStory.id) return;
+        const { id, creationDate, ...data } = updatedStory;
+        await updateDoc(doc(db, 'stories', id), { ...data, creationDate: creationDate instanceof Date ? creationDate.toISOString() : creationDate });
+    }
+
+    static async deleteStory(storyId: string): Promise<void> {
+        await deleteDoc(doc(db, 'stories', storyId));
+    }
+
+    // TASKS
+    static async getTasksByStory(storyId: string): Promise<Task[]> {
+        const q = query(collection(db, 'tasks'), where('storyId', '==', storyId));
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Task));
+    }
+
+    static async getTaskById(taskId: string): Promise<Task | undefined> {
+        const docSnap = await getDoc(doc(db, 'tasks', taskId));
+        if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() } as Task;
         }
+        return undefined;
     }
 
-    static deleteStory(storyId: string): void {
-        this.stories = this.stories.filter(s => s.id !== storyId);
-        this.saveStories();
+    static async addTask(task: Task): Promise<void> {
+        // Convert Task instance to plain object and ensure no undefined fields
+        const { id, createdAt, startedAt, finishedAt, ...data } = task;
+        await addDoc(collection(db, 'tasks'), {
+            ...data,
+            createdAt: createdAt instanceof Date ? createdAt.toISOString() : createdAt,
+            startedAt: startedAt instanceof Date ? startedAt.toISOString() : (startedAt ?? null),
+            finishedAt: finishedAt instanceof Date ? finishedAt.toISOString() : (finishedAt ?? null),
+            storyId: task.storyId,
+            name: task.name,
+            description: task.description,
+            priority: task.priority,
+            estimatedHours: task.estimatedHours,
+            state: task.state,
+            assignedUserId: task.assignedUserId ?? null,
+            actualHours: task.actualHours ?? null
+        });
     }
 
-    static getStoriesByProject(projectId: string): Story[] {
-        return this.stories.filter(s => s.projectId === projectId);
+    static async updateTask(updatedTask: Task): Promise<void> {
+        if (!updatedTask.id) return;
+        const { id, createdAt, startedAt, finishedAt, ...data } = updatedTask;
+        await updateDoc(doc(db, 'tasks', id), {
+            ...data,
+            createdAt: createdAt instanceof Date ? createdAt.toISOString() : createdAt,
+            startedAt: startedAt instanceof Date ? startedAt.toISOString() : startedAt,
+            finishedAt: finishedAt instanceof Date ? finishedAt.toISOString() : finishedAt
+        });
     }
 
-    static getAll(): Project[] {
-        const data = localStorage.getItem(STORAGE_KEY);
-        return data ? JSON.parse(data) : [];
-    }
-
-    static saveAll(projects: Project[]): void {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
-    }
-
-    static add(project: Project): void {
-        const projects = this.getAll();
-        this.saveAll([...projects, project]);
-    }
-
-    static update(updatedProject: Project): void {
-        const projects = this.getAll().map(p => p.id === updatedProject.id ? updatedProject : p);
-        this.saveAll(projects);
-    }
-
-    static delete(id: string): void {
-        const projects = this.getAll().filter(p => p.id !== id);
-        this.saveAll(projects);
-    }
-
-    static projects: { id: string; name: string; description: string }[] = [];
-
-    static getProjects(): { id: string; name: string; description: string }[] {
-        return this.projects;
-    }
-
-    static addProject(project: { id: string; name: string; description: string }): void {
-        this.projects.push(project);
-    }
-
-    static tasks: Task[] = [];
-
-    static loadTasks(): void {
-        const data = localStorage.getItem(TASKS_KEY);
-        this.tasks = data ? JSON.parse(data) : [];
-    }
-
-    static saveTasks(): void {
-        localStorage.setItem(TASKS_KEY, JSON.stringify(this.tasks));
-    }
-
-    static addTask(task: Task): void {
-        this.tasks.push(task);
-        this.saveTasks();
-    }
-
-    static getTasksByStory(storyId: string): Task[] {
-        return this.tasks.filter(t => t.storyId === storyId);
-    }
-
-    static getTaskById(taskId: string): Task | undefined {
-        return this.tasks.find(t => t.id === taskId);
-    }
-
-    static updateTask(updatedTask: Task): void {
-        const idx = this.tasks.findIndex(t => t.id === updatedTask.id);
-        if (idx !== -1) {
-            this.tasks[idx] = updatedTask;
-            this.saveTasks();
-        }
-    }
-
-    static deleteTask(taskId: string): void {
-        this.tasks = this.tasks.filter(t => t.id !== taskId);
-        this.saveTasks();
+    static async deleteTask(taskId: string): Promise<void> {
+        await deleteDoc(doc(db, 'tasks', taskId));
     }
 }

@@ -9,14 +9,19 @@ interface ProjectListProps {
 }
 
 export function ProjectList({ onProjectSelected, refresh, theme }: ProjectListProps) {
-    const [projects, setProjects] = useState<Project[]>(ProjectStorage.getAll());
+    const [projects, setProjects] = useState<Project[]>([]);
 
     useEffect(() => {
-        setProjects(ProjectStorage.getAll());
+        async function fetchProjects() {
+            const data = await ProjectStorage.getAll();
+            setProjects(data);
+        }
+
+        fetchProjects();
     }, [refresh]);
 
-    const handleDelete = (id: string) => {
-        ProjectStorage.delete(id);
+    const handleDelete = async (id: string) => {
+        await ProjectStorage.delete(id);
         setProjects((prevProjects) => prevProjects.filter((project) => project.id !== id));
         // Jeśli usunięto wybrany projekt, wyczyść wybór w rodzicu
         if (ProjectStorage.getCurrentProject() === id && onProjectSelected) {
@@ -32,15 +37,15 @@ export function ProjectList({ onProjectSelected, refresh, theme }: ProjectListPr
     };
 
     return (
-        <div>
+        <div className={`p-3 rounded shadow-sm border mt-2 ${theme === 'dark' ? 'bg-dark text-light border-secondary' : 'bg-body-tertiary text-dark border'}`} style={{ minWidth: 340 }}>
             <h2>Lista projektów</h2>
             {projects.length === 0 && <p>Brak projektów</p>}
-            <ul>
+            <ul className="mb-0">
                 {projects.map((project) => (
-                    <li key={project.id}>
+                    <li key={project.id} className="mb-2">
                         <strong>{project.name}</strong> - {project.description}
-                        <button onClick={() => handleSelectProject(project.id)} className={`btn ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Wybierz projekt</button>
-                        <button onClick={() => handleDelete(project.id)} className={`btn ${theme === 'dark' ? 'btn-outline-danger' : 'btn-outline-secondary'}`}>Usuń</button>
+                        <button onClick={() => handleSelectProject(project.id)} className={`btn btn-sm ms-2 ${theme === 'dark' ? 'btn-outline-secondary' : 'btn-outline-dark'}`}>Wybierz projekt</button>
+                        <button onClick={() => handleDelete(project.id)} className={`btn btn-sm ms-2 ${theme === 'dark' ? 'btn-outline-danger' : 'btn-outline-secondary'}`}>Usuń</button>
                     </li>
                 ))}
             </ul>
