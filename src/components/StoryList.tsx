@@ -25,7 +25,7 @@ const StoryList = ({ theme }: StoryListProps) => {
     return () => unsub();
   }, [currentProjectId]);
 
-  if (!currentProjectId) return null;
+  if (!currentProjectId || stories.length === 0) return null;
 
   const filteredStories =
     filter === 'all'

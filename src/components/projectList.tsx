@@ -37,10 +37,11 @@ export function ProjectList({ onProjectSelected, refresh, theme }: ProjectListPr
         }
     };
 
+    if (projects.length === 0) return null;
+
     return (
         <div className={`p-3 rounded shadow-sm border mt-2 ${theme === 'dark' ? 'bg-dark text-light border-secondary' : 'bg-body-tertiary text-dark border'}`} style={{ minWidth: 340 }}>
             <h2>Lista projektów</h2>
-            {projects.length === 0 && <p>Brak projektów</p>}
             <ul className="mb-0">
                 {projects.map((project) => (
                     <li key={project.id} className="mb-2">
