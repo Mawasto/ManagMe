@@ -78,14 +78,14 @@ describe('Dodawanie zadania przez TaskForm', () => {
     cy.get('button').contains('Zaloguj').click();
 
     // Dodaj projekt
-    cy.contains('label', 'Nazwa:').parent().find('input').type('Projekt Cypress');
+    cy.contains('label', 'Nazwa:').parent().find('input').type('Projekt E2E');
     cy.contains('label', 'Opis:').parent().find('textarea').type('Testowy opis projektu');
     cy.get('button').contains('Zapisz').click();
     cy.wait(1000);
-    cy.get('li').contains('Projekt Cypress').should('exist');
+    cy.get('li').contains('Projekt E2E').should('exist');
 
     // Wybierz projekt
-    cy.get('li').contains('Projekt Cypress').parent('li').within(() => {
+    cy.get('li').contains('Projekt E2E').parent('li').within(() => {
       cy.get('button').contains('Wybierz projekt').click();
     });
 
@@ -110,11 +110,11 @@ describe('Dodawanie zadania przez TaskForm', () => {
     cy.contains('Zadanie Cypress').should('exist');
 
     // Usuń projek
-    cy.get('li').contains('Projekt Cypress').parent('li').within(() => {
+    cy.get('li').contains('Projekt E2E').parent('li').within(() => {
       cy.get('button').contains('Usuń').click({force: true});
     });
     cy.wait(1000);
-    cy.contains('Projekt Cypress', {timeout: 6000}).should('not.exist');
+    cy.contains('Projekt E2E', {timeout: 6000}).should('not.exist');
   });
 });
 
@@ -191,14 +191,14 @@ describe('Dodawanie i usuwanie zadania w projekcie', () => {
     cy.get('button').contains('Zaloguj').click();
 
     // Dodaj projekt
-    cy.contains('label', 'Nazwa:').parent().find('input').type('Projekt Zadanie E2E');
+    cy.contains('label', 'Nazwa:').parent().find('input').type('Projekt E2E');
     cy.contains('label', 'Opis:').parent().find('textarea').type('Opis projektu do testu zadania');
     cy.get('button').contains('Zapisz').click();
     cy.wait(1000);
-    cy.contains('Projekt Zadanie E2E').should('exist');
+    cy.contains('Projekt E2E').should('exist');
 
     // Wybierz projekt
-    cy.get('li').contains('Projekt Zadanie E2E').parent('li').within(() => {
+    cy.get('li').contains('Projekt E2E').parent('li').within(() => {
       cy.get('button').contains('Wybierz projekt').click();
     });
 
@@ -222,16 +222,21 @@ describe('Dodawanie i usuwanie zadania w projekcie', () => {
     });
     cy.contains('Zadanie E2E').should('exist');
 
-    // Usuń zadanie
-    cy.contains('Zadanie E2E').parents('div').first().within(() => {
-      cy.get('button').contains('Usuń').click({force: true});
-    });
+
+    // Poczekaj aż zadanie się pojawi i kliknij przycisk Usuń w kafelku zadania
+    cy.contains('Zadanie E2E')
+      .should('exist')
+      .parents('div')
+      .eq(1) // przejdź wyżej do kontenera kafelka zadania
+      .within(() => {
+        cy.contains('button', 'Usuń').click({force: true});
+      });
     cy.contains('Zadanie E2E', {timeout: 6000}).should('not.exist');
 
     // Usuń projekt
-    cy.get('li').contains('Projekt Zadanie E2E').parent('li').within(() => {
+    cy.get('li').contains('Projekt E2E').parent('li').within(() => {
       cy.get('button').contains('Usuń').click({force: true});
     });
-    cy.contains('Projekt Zadanie E2E', {timeout: 6000}).should('not.exist');
+    cy.contains('Projekt E2E', {timeout: 6000}).should('not.exist');
   });
 });

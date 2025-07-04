@@ -13,6 +13,11 @@ interface TaskKanbanProps {
 const TaskKanban: React.FC<TaskKanbanProps> = ({ theme, storyId }) => {
     const [tasks, setTasks] = useState<Task[]>([]);
     const [detailsTask, setDetailsTask] = useState<Task | null>(null);
+    const [editTaskId, setEditTaskId] = useState<string | null>(null);
+    const [editName, setEditName] = useState("");
+    const [editDescription, setEditDescription] = useState("");
+    const [editPriority, setEditPriority] = useState<'low' | 'medium' | 'high'>('low');
+    const [editEstimatedHours, setEditEstimatedHours] = useState<number>(0);
 
     useEffect(() => {
         if (!storyId) return;
@@ -61,24 +66,96 @@ const TaskKanban: React.FC<TaskKanbanProps> = ({ theme, storyId }) => {
 
     const devUsers = UserManager.getAllUsers().filter(u => u.role === 'developer' || u.role === 'devops');
 
+    const handleEdit = (task: Task) => {
+        setEditTaskId(task.id);
+        setEditName(task.name);
+        setEditDescription(task.description);
+        setEditPriority(task.priority);
+        setEditEstimatedHours(task.estimatedHours || 0);
+    };
+
+    const handleEditCancel = () => {
+        setEditTaskId(null);
+        setEditName("");
+        setEditDescription("");
+        setEditPriority('low');
+        setEditEstimatedHours(0);
+    };
+
+    const handleEditSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editTaskId) return;
+        const task = tasks.find(t => t.id === editTaskId);
+        if (!task) return;
+        const updatedTask = { ...task, name: editName, description: editDescription, priority: editPriority, estimatedHours: editEstimatedHours };
+        await ProjectStorage.updateTask(updatedTask);
+        setEditTaskId(null);
+        setEditName("");
+        setEditDescription("");
+        setEditPriority('low');
+        setEditEstimatedHours(0);
+        refresh();
+    };
+
     const renderTask = (task: Task) => (
         <div key={task.id} style={{ border: '1px solid #ccc', margin: 8, padding: 8, background: theme === 'dark' ? '#222' : '#fff', borderRadius: 8 }}>
-            <div><b>{task.name}</b></div>
-            <div>Priorytet: {task.priority}</div>
-            <div>Przypisany: {task.assignedUserId || '-'}</div>
-            <div className="mt-2">
-                <button onClick={() => setDetailsTask(task)} className="btn btn-sm btn-outline-info me-1">Szczegóły</button>
-                <button onClick={() => handleStateChange(task.id, 'todo')} className="btn btn-sm btn-outline-primary me-1">Do zrobienia</button>
-                <button onClick={() => handleStateChange(task.id, 'doing')} className="btn btn-sm btn-outline-warning me-1">W trakcie</button>
-                <button onClick={() => handleStateChange(task.id, 'done')} className="btn btn-sm btn-outline-success me-1">Zrobione</button>
-                <button onClick={() => handleDelete(task.id)} className="btn btn-sm btn-outline-danger">Usuń</button>
-            </div>
-            <div className="mt-2">
-                <select value={task.assignedUserId || ''} onChange={e => handleAssign(task.id, e.target.value)} className="form-select form-select-sm">
-                    <option value="">Nieprzypisane</option>
-                    {devUsers.map(u => <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>)}
-                </select>
-            </div>
+            {editTaskId === task.id ? (
+                <form onSubmit={handleEditSave} className="mb-2">
+                    <input
+                        type="text"
+                        value={editName}
+                        onChange={e => setEditName(e.target.value)}
+                        className="form-control form-control-sm mb-1"
+                        required
+                    />
+                    <input
+                        type="text"
+                        value={editDescription}
+                        onChange={e => setEditDescription(e.target.value)}
+                        className="form-control form-control-sm mb-1"
+                        required
+                    />
+                    <select
+                        value={editPriority}
+                        onChange={e => setEditPriority(e.target.value as 'low' | 'medium' | 'high')}
+                        className="form-select form-select-sm mb-1"
+                    >
+                        <option value="low">Niski</option>
+                        <option value="medium">Średni</option>
+                        <option value="high">Wysoki</option>
+                    </select>
+                    <input
+                        type="number"
+                        value={editEstimatedHours}
+                        onChange={e => setEditEstimatedHours(Number(e.target.value))}
+                        className="form-control form-control-sm mb-1"
+                        min={0}
+                        required
+                    />
+                    <button type="submit" className={`btn btn-sm me-1 ${theme === 'dark' ? 'btn-outline-success' : 'btn-outline-primary'}`}>Zapisz</button>
+                    <button type="button" onClick={handleEditCancel} className="btn btn-sm btn-outline-secondary">Anuluj</button>
+                </form>
+            ) : (
+                <>
+                    <div><b>{task.name}</b></div>
+                    <div>Priorytet: {task.priority}</div>
+                    <div>Przypisany: {task.assignedUserId || '-'}</div>
+                    <div className="mt-2">
+                        <button onClick={() => setDetailsTask(task)} className="btn btn-sm btn-outline-info me-1">Szczegóły</button>
+                        <button onClick={() => handleStateChange(task.id, 'todo')} className="btn btn-sm btn-outline-primary me-1">Do zrobienia</button>
+                        <button onClick={() => handleStateChange(task.id, 'doing')} className="btn btn-sm btn-outline-warning me-1">W trakcie</button>
+                        <button onClick={() => handleStateChange(task.id, 'done')} className="btn btn-sm btn-outline-success me-1">Zrobione</button>
+                        <button onClick={() => handleEdit(task)} className="btn btn-sm btn-outline-warning me-1">Edytuj</button>
+                        <button onClick={() => handleDelete(task.id)} className="btn btn-sm btn-outline-danger">Usuń</button>
+                    </div>
+                    <div className="mt-2">
+                        <select value={task.assignedUserId || ''} onChange={e => handleAssign(task.id, e.target.value)} className="form-select form-select-sm">
+                            <option value="">Nieprzypisane</option>
+                            {devUsers.map(u => <option key={u.id} value={u.id}>{u.firstName} {u.lastName}</option>)}
+                        </select>
+                    </div>
+                </>
+            )}
         </div>
     );
 
