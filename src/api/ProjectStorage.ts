@@ -83,7 +83,12 @@ export class ProjectStorage {
     static async updateStory(updatedStory: Story): Promise<void> {
         if (!updatedStory.id) return;
         const { id, creationDate, ...data } = updatedStory;
-        await updateDoc(doc(db, 'stories', id), { ...data, creationDate: creationDate instanceof Date ? creationDate.toISOString() : creationDate });
+        await updateDoc(doc(db, 'stories', id), {
+            ...data,
+            creationDate: creationDate instanceof Date ? creationDate.toISOString() : creationDate,
+            projectId: updatedStory.projectId,
+            ownerId: updatedStory.ownerId
+        });
     }
 
     static async deleteStory(storyId: string): Promise<void> {
